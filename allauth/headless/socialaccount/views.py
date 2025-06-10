@@ -102,8 +102,16 @@ class ManageProvidersView(AuthenticatedAPIView):
 class ProviderTokenView(APIView):
     input_class = ProviderTokenInput
 
+    def dispatch(self, request, *args, **kwargs):
+        print("Dispatching")
+        print(request)
+        logger.info(
+            f"Request: {request}"
+        )
+        super().dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
-        print("Mungmungmung")
+        print("Handling POST")
         print(self.input)
         try:
             sociallogin = self.input.cleaned_data["sociallogin"]
