@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Dict, Optional, Type, Union
 
 from django.http import HttpResponseBadRequest
@@ -8,6 +9,7 @@ from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.headless.internal.restkit.inputs import Input
 from allauth.headless.internal.restkit.response import ErrorResponse
 
+logger = logging.getLogger(__name__)
 
 class RESTView(View):
     input_class: Union[Optional[Dict[str, Type[Input]]], Type[Input]] = None
@@ -42,7 +44,10 @@ class RESTView(View):
             # Make form bound on empty POST
             data = {}
         self.input = input_class(data=data, **input_kwargs)
+        print("In handle input")
+        print(self.input)
         if not self.input.is_valid():
+            print("In handle invalid input")
             return self.handle_invalid_input(self.input)
 
     def handle_invalid_input(self, input):
@@ -52,6 +57,8 @@ class RESTView(View):
         if request.method == "GET" or not request.body:
             return
         try:
-            return json.loads(request.body.decode("utf8"))
+            data = json.loads(request.body.decode("utf8"))
+            print(f"Parsed json: {data}")
+            return data
         except (UnicodeDecodeError, json.JSONDecodeError):
             raise ImmediateHttpResponse(response=HttpResponseBadRequest())

@@ -54,13 +54,16 @@ class ProviderTokenInput(inputs.Input):
 
     def clean(self):
         cleaned_data = super().clean()
+        print(f"Cleaned Data: {cleaned_data}")
         token = self.data.get("token")
         adapter = get_adapter()
         if not isinstance(token, dict):
+            print(f"Token is not a dictionary: {token}")
             self.add_error("token", adapter.validation_error("invalid_token"))
             token = None
 
         provider_id = cleaned_data.get("provider")
+        print(f"Provider ID: {provider_id}")
         provider = None
         if provider_id and token:
             provider_class = registry.get_class(provider_id)
@@ -113,5 +116,6 @@ class ProviderTokenInput(inputs.Input):
                 login.state["process"] = cleaned_data["process"]
                 cleaned_data["sociallogin"] = login
             except ValidationError as e:
+                print(f"Token verification failed: {e}")
                 self.add_error("token", e)
         return cleaned_data

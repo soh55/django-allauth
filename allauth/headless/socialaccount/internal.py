@@ -27,6 +27,7 @@ def on_authentication_error(
     """
     Called at a time when it is not clear whether or not this is a headless flow.
     """
+    print(f"In authentication error: {provider} - {error}")
     state = None
     if extra_context:
         state = extra_context.get("state")
