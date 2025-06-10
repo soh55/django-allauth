@@ -78,6 +78,7 @@ class ProviderTokenInput(inputs.Input):
                         context.request, provider_id, client_id=client_id
                     )
                 except SocialApp.DoesNotExist:
+                    print(f"SocialApp not found for provider ID: {provider_id}")
                     self.add_error("token", adapter.validation_error("invalid_token"))
                 else:
                     if not provider.supports_token_authentication:
