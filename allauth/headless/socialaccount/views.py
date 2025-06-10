@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ValidationError
 
 from allauth.core.exceptions import SignupClosedException
@@ -26,6 +28,7 @@ from allauth.socialaccount.helpers import render_authentication_error
 from allauth.socialaccount.internal import flows
 from allauth.socialaccount.models import SocialAccount
 
+logger = logging.getLogger(__name__)
 
 class ProviderSignupView(APIView):
     input_class = SignupInput
@@ -100,7 +103,13 @@ class ProviderTokenView(APIView):
     input_class = ProviderTokenInput
 
     def post(self, request, *args, **kwargs):
-        sociallogin = self.input.cleaned_data["sociallogin"]
+        print("Mungmungmung")
+        print(self.input)
+        try:
+            sociallogin = self.input.cleaned_data["sociallogin"]
+        except KeyError:
+            logger.error("Missing sociallogin in input data")
+            return ErrorResponse(self.request, exception=ValidationError("Missing sociallogin"))
         response = None
         try:
             response = complete_token_login(request, sociallogin)
