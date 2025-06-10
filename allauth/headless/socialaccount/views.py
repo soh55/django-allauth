@@ -104,7 +104,7 @@ class ProviderTokenView(APIView):
 
     def dispatch(self, request, *args, **kwargs):
         print("Dispatching")
-        print(request)
+        print(request.POST)
         logger.info(
             f"Request: {request}"
         )
