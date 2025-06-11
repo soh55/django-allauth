@@ -1,4 +1,5 @@
 import requests
+import logging
 
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import get_adapter
@@ -8,6 +9,7 @@ from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 
+logger = logging.getLogger("allauth.socialaccount.providers.apple")
 
 class AppleAccount(ProviderAccount):
     def to_str(self):
@@ -75,6 +77,15 @@ class AppleProvider(OAuth2Provider):
 
         id_token = token.get("id_token")
         if not id_token:
+            logging.error(
+                f"""
+                Error: Invalid token received from Apple OAuth2 provider.
+                Token: {id_token}
+                Provider: {self.name}
+                Audiences: {self.get_auds()}
+                App: {self.app.name}
+                """
+            )
             raise get_adapter().validation_error("invalid_token")
         try:
             identity_data = AppleOAuth2Adapter.get_verified_identity_data(
