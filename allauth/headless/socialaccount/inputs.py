@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ValidationError
 
 from allauth.core import context
@@ -12,6 +14,8 @@ from allauth.socialaccount.models import SocialAccount, SocialApp
 from allauth.socialaccount.providers import registry
 from allauth.socialaccount.providers.base.constants import AuthProcess
 
+logger = logging.getLogger('allauth')
+logger.setLevel(logging.DEBUG)
 
 class SignupInput(SignupForm, inputs.Input):
     pass
@@ -59,6 +63,7 @@ class ProviderTokenInput(inputs.Input):
         adapter = get_adapter()
         if not isinstance(token, dict):
             print(f"Token is not a dictionary: {token}")
+            logger.error(f"Token is not a dictionary: {token}")
             self.add_error("token", adapter.validation_error("invalid_token"))
             token = None
 
@@ -79,6 +84,7 @@ class ProviderTokenInput(inputs.Input):
                     )
                 except SocialApp.DoesNotExist:
                     print(f"SocialApp not found for provider ID: {provider_id}")
+                    logger.error(f"SocialApp not found for provider ID: {provider_id}")
                     self.add_error("token", adapter.validation_error("invalid_token"))
                 else:
                     if not provider.supports_token_authentication:
