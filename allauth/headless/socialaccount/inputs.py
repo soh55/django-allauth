@@ -125,9 +125,10 @@ class ProviderTokenInput(inputs.Input):
             cleaned_data["provider"] = provider
             try:
                 login = provider.verify_token(context.request, token)
+                logger.error(f"Login: {login}")
                 login.state["process"] = cleaned_data["process"]
                 cleaned_data["sociallogin"] = login
             except ValidationError as e:
-                print(f"Token verification failed: {e}")
+                logger.error(f"Token verification failed: {e}")
                 self.add_error("token", e)
         return cleaned_data

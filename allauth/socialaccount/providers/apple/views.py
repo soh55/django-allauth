@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import timedelta
 
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
@@ -20,6 +21,7 @@ from allauth.utils import build_absolute_uri, get_request_param
 from .apple_session import get_apple_session
 from .client import AppleOAuth2Client
 
+logger = logging.getLogger("allauth.socialaccount.providers.apple")
 
 class AppleOAuth2Adapter(OAuth2Adapter):
     client_class = AppleOAuth2Client
@@ -30,6 +32,7 @@ class AppleOAuth2Adapter(OAuth2Adapter):
 
     @classmethod
     def get_verified_identity_data(cls, provider, id_token):
+        logger.error("In allauth/socialaccount/providers/apple/views.py - get_verified_identity_data")
         data = jwtkit.verify_and_decode(
             credential=id_token,
             keys_url=cls.public_key_url,
@@ -40,6 +43,7 @@ class AppleOAuth2Adapter(OAuth2Adapter):
         return data
 
     def parse_token(self, data):
+        logger.error("In allauth/socialaccount/providers/apple/views.py - parse_token")
         token = SocialToken(
             token=data["access_token"],
         )
@@ -59,6 +63,7 @@ class AppleOAuth2Adapter(OAuth2Adapter):
         return token
 
     def complete_login(self, request, app, token, **kwargs):
+        logger.error("In allauth/socialaccount/providers/apple/views.py - complete_login")
         extra_data = token.user_data
         login = self.get_provider().sociallogin_from_response(
             request=request, response=extra_data
@@ -71,6 +76,7 @@ class AppleOAuth2Adapter(OAuth2Adapter):
         return login
 
     def get_user_scope_data(self, request):
+        logger.error("In allauth/socialaccount/providers/apple/views.py - get_user_scope_data")
         user_scope_data = request.apple_login_session.get("user", "")
         try:
             return json.loads(user_scope_data)
@@ -81,6 +87,7 @@ class AppleOAuth2Adapter(OAuth2Adapter):
 
     def get_access_token_data(self, request, app, client, pkce_code_verifier=None):
         """We need to gather the info from the apple specific login"""
+        logger.error("In allauth/socialaccount/providers/apple/views.py - get_access_token_data")
         apple_session = get_apple_session(request)
 
         # Exchange `code`
@@ -118,6 +125,7 @@ def apple_post_callback(request, finish_endpoint_name="apple_finish_callback"):
             overridden in your url configuration if you have more than one
             callback endpoint.
     """
+    logger.error("In allauth/socialaccount/providers/apple/views.py - apple_post_callback")
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     apple_session = get_apple_session(request)

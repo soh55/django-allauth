@@ -74,6 +74,7 @@ class AppleProvider(OAuth2Provider):
         from allauth.socialaccount.providers.apple.views import (
             AppleOAuth2Adapter,
         )
+        logger.error("In allauth/socialaccount/providers/apple/provider.py - verify_token")
 
         id_token = token.get("id_token")
         if not id_token:
@@ -91,7 +92,9 @@ class AppleProvider(OAuth2Provider):
             identity_data = AppleOAuth2Adapter.get_verified_identity_data(
                 self, id_token
             )
+            logger.info(f"Verified identity data: {identity_data}")
         except (OAuth2Error, requests.RequestException) as e:
+            logger.error(f"Error verifying token: {e}")
             raise get_adapter().validation_error("invalid_token") from e
         login = self.sociallogin_from_response(request, identity_data)
         return login
