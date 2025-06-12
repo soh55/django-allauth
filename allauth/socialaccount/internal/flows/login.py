@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -18,8 +19,10 @@ from allauth.socialaccount.internal.flows.signup import (
 from allauth.socialaccount.models import SocialLogin
 from allauth.socialaccount.providers.base import AuthProcess
 
+logger = logging.getLogger(__name__)
 
 def _login(request, sociallogin):
+    logger.error("In allauth/socialaccount/internal/flows/login.py - _login")
     sociallogin._accept_login(request)
     record_authentication(request, sociallogin)
     return perform_login(
@@ -32,6 +35,7 @@ def _login(request, sociallogin):
 
 
 def pre_social_login(request, sociallogin):
+    logger.error("In allauth/socialaccount/internal/flows/login.py - pre_social_login")
     clear_pending_signup(request)
     assert not sociallogin.is_existing  # nosec
     sociallogin.lookup()
@@ -42,6 +46,7 @@ def pre_social_login(request, sociallogin):
 
 
 def complete_login(request, sociallogin, raises=False):
+    logger.error("In allauth/socialaccount/internal/flows/login.py - complete_login")
     try:
         pre_social_login(request, sociallogin)
         process = sociallogin.state.get("process")
@@ -55,6 +60,7 @@ def complete_login(request, sociallogin, raises=False):
         else:
             return _authenticate(request, sociallogin)
     except SignupClosedException:
+        logger.error("Signup is closed")
         if raises:
             raise
         return render(
@@ -62,6 +68,7 @@ def complete_login(request, sociallogin, raises=False):
             "account/signup_closed." + account_settings.TEMPLATE_EXTENSION,
         )
     except ImmediateHttpResponse as e:
+        logger.error("ImmediateHttpResponse")
         if raises:
             raise
         return e.response
@@ -73,6 +80,7 @@ def _redirect(request, sociallogin):
 
 
 def _authenticate(request, sociallogin):
+    logger.error("In allauth/socialaccount/internal/flows/login.py - _authenticate")
     if request.user.is_authenticated:
         get_account_adapter(request).logout(request)
     if sociallogin.is_existing:
@@ -85,6 +93,7 @@ def _authenticate(request, sociallogin):
 
 
 def record_authentication(request, sociallogin):
+    logger.error("In allauth/socialaccount/internal/flows/login.py - record_authentication")
     from allauth.account.internal.flows.login import record_authentication
 
     record_authentication(
