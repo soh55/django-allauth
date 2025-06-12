@@ -112,7 +112,7 @@ class ProviderTokenView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        print("Handling POST")
+        print("In allauth/headless/socialaccount/views.py")
         print(self.input)
         try:
             sociallogin = self.input.cleaned_data["sociallogin"]

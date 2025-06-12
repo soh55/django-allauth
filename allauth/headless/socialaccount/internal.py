@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponseRedirect
 
@@ -15,6 +17,7 @@ from allauth.socialaccount.providers.base.constants import (
     AuthProcess,
 )
 
+logger = logging.getLogger(__name__)
 
 def on_authentication_error(
     request,
@@ -64,12 +67,16 @@ def complete_login(request, sociallogin):
     try:
         flows.login.complete_login(request, sociallogin, raises=True)
     except ReauthenticationRequired:
+        logger.error(f"Reauthentication required for user {sociallogin.user.id}")
         error = "reauthentication_required"
     except SignupClosedException:
+        logger.error(f"Signup closed for user {sociallogin.user.id}")
         error = "signup_closed"
     except PermissionDenied:
+        logger.error(f"Permission denied for user {sociallogin.user.id}")
         error = "permission_denied"
     except ValidationError as e:
+        logger.error(f"Validation error for user {sociallogin.user.id}: {e}")
         error = e.code
     else:
         # At this stage, we're either:
@@ -95,4 +102,6 @@ def complete_login(request, sociallogin):
             next_url,
             {"error": error, "error_process": sociallogin.state["process"]},
         )
+        logger.error(f"Error occurred during social login for user {sociallogin.user.id}: {error}")
+
     return HttpResponseRedirect(next_url)

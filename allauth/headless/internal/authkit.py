@@ -1,3 +1,5 @@
+import logging
+
 from contextlib import contextmanager
 from typing import Any, Dict, Optional
 
@@ -10,6 +12,7 @@ from allauth.headless import app_settings
 from allauth.headless.constants import Client
 from allauth.headless.internal import sessionkit
 
+logger = logging.getLogger(__name__)
 
 class AuthenticationStatus:
     def __init__(self, request):
@@ -54,6 +57,13 @@ def authentication_context(request):
         if session_token:
             session = strategy.lookup_session(session_token)
             if not session:
+                logger.error(f"""
+                    Session token {session_token} not found.
+                    Request: {request.POST}
+                    User: {request.user}
+                    Old User: {old_user}
+                    Old Session: {old_session}
+                """)
                 raise ImmediateHttpResponse(UnauthorizedResponse(request, status=410))
             request.session = session
             purge_request_user_cache(request)
