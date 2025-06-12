@@ -152,9 +152,12 @@ class Provider:
             account=socialaccount,
             email_addresses=email_addresses,
         )
-        user = sociallogin.user = adapter.new_user(request, sociallogin)
-        user.set_unusable_password()
-        adapter.populate_user(request, sociallogin, common_fields)
+        try:
+            user = sociallogin.user = adapter.new_user(request, sociallogin)
+            user.set_unusable_password()
+            adapter.populate_user(request, sociallogin, common_fields)
+        except Exception as e:
+            logger.error(f"Error creating user: {repr(e)}")
         return sociallogin
 
     def extract_uid(self, data) -> str:

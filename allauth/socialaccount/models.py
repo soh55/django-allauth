@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Optional
 
 from django.conf import settings
@@ -21,6 +22,8 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.internal import statekit
 from allauth.utils import get_request_param
 
+
+logger = logging.getLogger(__name__)
 
 if not allauth_settings.SOCIALACCOUNT_ENABLED:
     raise ImproperlyConfigured(
@@ -317,8 +320,10 @@ class SocialLogin:
         """Look up the existing local user account to which this social login
         points, if any.
         """
+        logger.info("In allauth/socialaccount/models.py - lookup")
         self._did_authenticate_by_email = None
         if not self._lookup_by_socialaccount():
+            logger.info("In allauth/socialaccount/models.py - lookup - _lookup_by_email")
             self._lookup_by_email()
 
     def _lookup_by_socialaccount(self) -> bool:
@@ -365,17 +370,22 @@ class SocialLogin:
             self.token.save()
 
     def _lookup_by_email(self) -> None:
+        logger.info("In allauth/socialaccount/models.py - lookup - _lookup_by_email")
         emails = [e.email for e in self.email_addresses if e.verified]
+        logger.info("In allauth/socialaccount/models.py - lookup - _lookup_by_email - emails: %s", emails)
         for email in emails:
             if not get_adapter().can_authenticate_by_email(self, email):
+                logger.info("Skipping email %s", email)
                 continue
             users = filter_users_by_email(email, prefer_verified=True)
             if users:
+                logger.info("Found users: %s", list(set(users)))
                 self.user = users[0]
                 self._did_authenticate_by_email = email
                 return
 
     def _accept_login(self, request) -> None:
+        logger.info("In allauth/socialaccount/models.py - lookup - _accept_login")
         from allauth.socialaccount.internal.flows.email_authentication import (
             wipe_password,
         )

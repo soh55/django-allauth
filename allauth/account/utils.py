@@ -1,3 +1,4 @@
+import logging
 import unicodedata
 from collections import OrderedDict
 from typing import List, Optional
@@ -19,6 +20,8 @@ from allauth.account.models import Login
 from allauth.core.internal import httpkit
 from allauth.utils import get_request_param, valid_email_or_none
 
+
+logger = logging.getLogger(__name__)
 
 def _unicode_ci_compare(s1, s2) -> bool:
     """
@@ -279,11 +282,15 @@ def filter_users_by_email(
     """
     from .models import EmailAddress
 
+    logger.info("In allauth/account/utils.py - filter_users_by_email")
+
     User = get_user_model()
     email = email.lower()
     mails = list(EmailAddress.objects.filter(email=email).select_related("user"))
+    logger.info("Emails found: %s", len(mails))
     is_verified = False
     if prefer_verified:
+        logger.info("Prefer verified emails")
         verified_mails = list(filter(lambda e: e.verified, mails))
         if verified_mails:
             mails = verified_mails
