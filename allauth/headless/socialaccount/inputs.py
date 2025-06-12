@@ -108,6 +108,7 @@ class ProviderTokenInput(inputs.Input):
                         )
                     else:
                         id_token = token.get("id_token")
+                        logger.error(f"ID Token: {id_token}")
                         access_token = token.get("access_token")
                         if (
                             (id_token is not None and not isinstance(id_token, str))
@@ -117,7 +118,7 @@ class ProviderTokenInput(inputs.Input):
                             )
                             or (not id_token and not access_token)
                         ):
-                            logger.error("Invalid token")
+                            logger.error("Invalid token - token required")
                             self.add_error(
                                 "token", adapter.validation_error("token_required")
                             )

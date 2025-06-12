@@ -75,15 +75,16 @@ class AppleProvider(OAuth2Provider):
             AppleOAuth2Adapter,
         )
         logger.error("In allauth/socialaccount/providers/apple/provider.py - verify_token")
-
         id_token = token.get("id_token")
+
+        logger.error(f"Audencies: {self.get_auds()}\nToken:{token}\nID Token: {id_token}")
+
         if not id_token:
             logging.error(
                 f"""
                 Error: Invalid token received from Apple OAuth2 provider.
                 Token: {id_token}
                 Provider: {self.name}
-                Audiences: {self.get_auds()}
                 App: {self.app.name}
                 """
             )
