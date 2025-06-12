@@ -84,7 +84,6 @@ def _authenticate(request, sociallogin):
     logger.error(f"""
         Social Login: {sociallogin}
         User: {request.user}
-        Social Account: {sociallogin.account}
         Social token: {sociallogin.token}
         Social email: {sociallogin.email_addresses}
         Login state: {sociallogin.state}
