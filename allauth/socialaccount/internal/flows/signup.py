@@ -1,3 +1,5 @@
+import logging
+
 from django.forms import ValidationError
 
 from allauth.account import app_settings as account_settings
@@ -14,6 +16,7 @@ from allauth.socialaccount import app_settings
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialLogin
 
+logger = logging.getLogger(__name__)
 
 def get_pending_signup(request):
     data = request.session.get("socialaccount_sociallogin")
@@ -79,12 +82,14 @@ def process_auto_signup(request, sociallogin):
 
 
 def process_signup(request, sociallogin):
+    logger.error("In allauth/socialaccount/internal/flows/signup.py - process_signup")
     if not get_adapter().is_open_for_signup(request, sociallogin):
         raise SignupClosedException()
     auto_signup, resp = process_auto_signup(request, sociallogin)
     if resp:
         return resp
     if not auto_signup:
+        logger.error("Redirecting to signup page")
         resp = redirect_to_signup(request, sociallogin)
     else:
         # Ok, auto signup it is, at least the email address is ok.
@@ -94,6 +99,7 @@ def process_signup(request, sociallogin):
             try:
                 get_account_adapter(request).clean_username(username)
             except ValidationError:
+                logger.error("Invalid username")
                 # This username is no good ...
                 user_username(sociallogin.user, "")
         # TODO: This part contains a lot of duplication of logic

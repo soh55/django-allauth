@@ -81,7 +81,16 @@ def _redirect(request, sociallogin):
 
 def _authenticate(request, sociallogin):
     logger.error("In allauth/socialaccount/internal/flows/login.py - _authenticate")
-    logger.error(f"Social Loging: {sociallogin}")
+    logger.error(f"""
+        Social Login: {sociallogin}
+        User: {request.user}
+        Social Account: {sociallogin.account}
+        Social token: {sociallogin.token}
+        Social email: {sociallogin.email_addresses}
+        Login state: {sociallogin.state}
+        Did auth by email: {sociallogin._did_authenticate_by_email}
+
+        """)
     if request.user.is_authenticated:
         logger.error("User is authenticated")
         get_account_adapter(request).logout(request)
