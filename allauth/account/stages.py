@@ -1,3 +1,5 @@
+import logging
+
 from typing import List, Optional
 
 from allauth.account import app_settings
@@ -7,6 +9,8 @@ from allauth.account.models import EmailAddress
 from allauth.core.internal.httpkit import headed_redirect_response
 from allauth.utils import import_callable
 
+
+logger = logging.getLogger(__name__)
 
 class LoginStage:
     key: str  # Set in subclasses
@@ -51,6 +55,7 @@ class LoginStageController:
 
     @classmethod
     def enter(cls, request, stage_key):
+        logger.error("In account/stages.py - enter")
         from allauth.account.internal.stagekit import unstash_login
 
         login = unstash_login(request, peek=True)
@@ -66,16 +71,20 @@ class LoginStageController:
         return None
 
     def set_current(self, stage_key):
+        logger.error("In account/stages.py - set_current")
         self.state["current"] = stage_key
 
     def is_handled(self, stage_key):
+        logger.error("In account/stages.py - is_handled")
         return self.state.get(stage_key, {}).get("handled", False)
 
     def set_handled(self, stage_key):
+        logger.error("In account/stages.py - set_handled")
         stage_state = self.state.setdefault(stage_key, {})
         stage_state["handled"] = True
 
     def get_pending_stage(self) -> Optional[LoginStage]:
+        logger.error("In account/stages.py - get_pending_stage")
         ret = None
         stages = self.get_stages()
         for stage in stages:
@@ -86,12 +95,14 @@ class LoginStageController:
         return ret
 
     def get_stage(self, key: str) -> Optional[LoginStage]:
+        logger.error("In account/stages.py - get_stage")
         try:
             return next(iter(stage for stage in self.get_stages() if stage.key == key))
         except StopIteration:
             return None
 
     def get_stages(self) -> List[LoginStage]:
+        logger.error("In account/stages.py - get_stages")
         stages = []
         adapter = get_adapter(self.request)
         paths = adapter.get_login_stages()
@@ -103,6 +114,7 @@ class LoginStageController:
 
     def handle(self):
         from allauth.account.internal.stagekit import clear_login, stash_login
+        logger.error("In account/stages.py - handle")
 
         stages = self.get_stages()
         for stage in stages:

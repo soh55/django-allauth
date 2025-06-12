@@ -44,7 +44,7 @@ class AuthenticationStageAPIView(APIView):
         if not self.stage:
             logger.error(
                 f"""
-                In handle
+                In allauth/headless/base/views.py - handle
                 Request: {request.POST}
                 User: {request.user}
                 Stage: {self.stage_class}

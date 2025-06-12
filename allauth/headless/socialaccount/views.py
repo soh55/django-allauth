@@ -112,8 +112,7 @@ class ProviderTokenView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        print("In allauth/headless/socialaccount/views.py")
-        print(self.input)
+        logger.error("In allauth/headless/socialaccount/views.py - post")
         try:
             sociallogin = self.input.cleaned_data["sociallogin"]
         except KeyError:

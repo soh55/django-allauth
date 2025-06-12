@@ -30,7 +30,7 @@ def on_authentication_error(
     """
     Called at a time when it is not clear whether or not this is a headless flow.
     """
-    print(f"In authentication error: {provider} - {error}")
+    logger.error(f"In authentication error: {provider} - {error}")
     state = None
     if extra_context:
         state = extra_context.get("state")
@@ -56,6 +56,7 @@ def on_authentication_error(
 
 
 def complete_token_login(request, sociallogin):
+    logger.error(f"In allauth/headless/socialaccount/internal.py - complete_token_login")
     return flows.login.complete_login(request, sociallogin, raises=True)
 
 
@@ -63,6 +64,7 @@ def complete_login(request, sociallogin):
     """
     Called when `sociallogin.is_headless`.
     """
+    logger.error("In allauth/headless/socialaccount/internal.py - complete_login")
     error = None
     try:
         flows.login.complete_login(request, sociallogin, raises=True)
@@ -87,6 +89,8 @@ def complete_login(request, sociallogin):
         # 4) Stopped, due to not being open-for-signup
         # It would be good to refactor the above into a more generic social login
         # pipeline with clear stages, but for now the /auth endpoint properly responds
+
+        logger.error("Mungmung woof woof")
         status = AuthenticationStatus(request)
         if all(
             [
