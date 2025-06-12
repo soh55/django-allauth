@@ -81,14 +81,19 @@ def _redirect(request, sociallogin):
 
 def _authenticate(request, sociallogin):
     logger.error("In allauth/socialaccount/internal/flows/login.py - _authenticate")
+    logger.error(f"Social Loging: {sociallogin}")
     if request.user.is_authenticated:
+        logger.error("User is authenticated")
         get_account_adapter(request).logout(request)
     if sociallogin.is_existing:
         # Login existing user
+        logger.error("Login existing user")
         ret = _login(request, sociallogin)
     else:
+        logger.error("New social user")
         # New social user
         ret = process_signup(request, sociallogin)
+    logger.error("Authentication completed")
     return ret
 
 
