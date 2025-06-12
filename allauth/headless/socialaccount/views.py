@@ -123,7 +123,9 @@ class ProviderTokenView(APIView):
         try:
             response = complete_token_login(request, sociallogin)
         except ValidationError as e:
+            logger.error(f"Validation error: {e}")
             return ErrorResponse(self.request, exception=e)
         except SignupClosedException:
+            logger.error("Signup closed")
             return ForbiddenResponse(self.request)
         return AuthenticationResponse.from_response(self.request, response)

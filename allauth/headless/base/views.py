@@ -19,6 +19,7 @@ class APIView(RESTView):
 
     @classonlymethod
     def as_api_view(cls, **initkwargs):
+        logger.error("In as_api_view")
         view_func = cls.as_view(**initkwargs)
         if initkwargs["client"] == Client.APP:
             view_func = decorators.app_view(view_func)
@@ -27,9 +28,11 @@ class APIView(RESTView):
         return view_func
 
     def dispatch(self, request, *args, **kwargs):
+        logger.error("In dispatch")
         try:
             return super().dispatch(request, *args, **kwargs)
         except ReauthenticationRequired:
+            logger.error("In ReauthenticationRequired")
             return response.ReauthenticationResponse(self.request)
 
 

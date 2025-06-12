@@ -90,6 +90,7 @@ class ProviderTokenInput(inputs.Input):
                     self.add_error("token", adapter.validation_error("invalid_token"))
                 else:
                     if not provider.supports_token_authentication:
+                        logger.error("Token authentication not supported for provider ID")
                         self.add_error(
                             "provider",
                             adapter.validation_error(
@@ -101,6 +102,7 @@ class ProviderTokenInput(inputs.Input):
                         and client_id
                         and provider.app.client_id != client_id
                     ):
+                        logger.error("Client ID mismatch")
                         self.add_error(
                             "token", adapter.validation_error("client_id_mismatch")
                         )
@@ -115,6 +117,7 @@ class ProviderTokenInput(inputs.Input):
                             )
                             or (not id_token and not access_token)
                         ):
+                            logger.error("Invalid token")
                             self.add_error(
                                 "token", adapter.validation_error("token_required")
                             )

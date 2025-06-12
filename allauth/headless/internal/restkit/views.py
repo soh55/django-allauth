@@ -69,6 +69,5 @@ class RESTView(View):
             logger.error(f"""
                 Error parsing JSON
                 request: {request.body.decode("utf8")}
-                Error: {str(e)}
             """)
             raise ImmediateHttpResponse(response=HttpResponseBadRequest())
