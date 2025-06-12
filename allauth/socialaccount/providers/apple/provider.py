@@ -77,7 +77,7 @@ class AppleProvider(OAuth2Provider):
         logger.error("In allauth/socialaccount/providers/apple/provider.py - verify_token")
         id_token = token.get("id_token")
 
-        logger.error(f"Audencies: {self.get_auds()}\nToken:{token}\nID Token: {id_token}")
+        logger.error(f"Audiences: {self.get_auds()}\nToken:{token}\nID Token: {id_token}")
 
         if not id_token:
             logging.error(

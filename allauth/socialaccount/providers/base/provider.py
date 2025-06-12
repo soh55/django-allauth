@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Optional
 
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -9,6 +10,9 @@ from allauth.socialaccount import app_settings
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.internal import statekit
 from allauth.socialaccount.providers.base.constants import AuthProcess
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProviderException(Exception):
@@ -101,29 +105,40 @@ class Provider:
             social auth provider.
         :return: A populated instance of the `SocialLogin` model (unsaved).
         """
+
         # NOTE: Avoid loading models at top due to registry boot...
         from allauth.socialaccount.adapter import get_adapter
         from allauth.socialaccount.models import SocialAccount, SocialLogin
 
+        logger.info("In allauth/socialaccount/providers/base/provider.py - sociallogin_from_response")
+
         adapter = get_adapter()
         uid = self.extract_uid(response)
+        logger.info(f"uid: {repr(uid)}")
         if not isinstance(uid, str):
+            logger.error(f"uid must be a string: {repr(uid)}")
             raise ValueError(f"uid must be a string: {repr(uid)}")
         if len(uid) > app_settings.UID_MAX_LENGTH:
+            logger.error(f"uid too long: {repr(uid)}")
             raise ImproperlyConfigured(
                 f"SOCIALACCOUNT_UID_MAX_LENGTH too small (<{len(uid)})"
             )
         if not uid:
+            logger.error("uid is empty")
             raise ValueError("uid must be a non-empty string")
 
         extra_data = self.extract_extra_data(response)
+        logger.info(f"extra_data: {repr(extra_data)}")
+
         common_fields = self.extract_common_fields(response)
+        logger.info(f"common_fields: {repr(common_fields)}")
         socialaccount = SocialAccount(
             extra_data=extra_data,
             uid=uid,
             provider=self.sub_id,
         )
         email_addresses = self.extract_email_addresses(response)
+        logger.info(f"email_addresses: {repr(email_addresses)}")
         email = self.cleanup_email_addresses(
             common_fields.get("email"),
             email_addresses,
@@ -131,6 +146,7 @@ class Provider:
         )
         if email:
             common_fields["email"] = email
+            logger.info(f"email: {repr(email)}")
         sociallogin = SocialLogin(
             provider=self,
             account=socialaccount,
