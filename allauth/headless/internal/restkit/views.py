@@ -33,6 +33,8 @@ class RESTView(View):
         if isinstance(input_class, dict):
             input_class = input_class.get(self.request.method)
 
+        logger.info(f"Using input class: {input_class}")
+
         return input_class
 
     def get_input_kwargs(self):
