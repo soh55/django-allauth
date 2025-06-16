@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from allauth import app_settings as allauth_settings
@@ -12,6 +13,9 @@ from allauth.headless.constants import Flow
 from allauth.headless.internal import authkit
 from allauth.headless.internal.restkit.response import APIResponse
 from allauth.mfa import app_settings as mfa_settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseAuthenticationResponse(APIResponse):
@@ -146,6 +150,7 @@ class ForbiddenResponse(APIResponse):
 
 class ConflictResponse(APIResponse):
     def __init__(self, request):
+        logger.info(f"ConflictResponse initialized with request: {request}")
         super().__init__(request, status=HTTPStatus.CONFLICT)
 
 
@@ -190,6 +195,9 @@ class ConfigResponse(APIResponse):
             )
 
             data.update(get_usersessions_config_data(request))
+
+        logger.info(f"ConfigResponse initialized with data: {data}")
+
         return super().__init__(request, data=data)
 
 

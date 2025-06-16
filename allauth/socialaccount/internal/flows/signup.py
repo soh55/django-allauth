@@ -19,21 +19,25 @@ from allauth.socialaccount.models import SocialLogin
 logger = logging.getLogger(__name__)
 
 def get_pending_signup(request):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:get_pending_signup: Retrieving pending signup for request: {request}")
     data = request.session.get("socialaccount_sociallogin")
     if data:
         return SocialLogin.deserialize(data)
 
 
 def redirect_to_signup(request, sociallogin):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:redirect_to_signup: Redirecting to signup for request: {request}")
     request.session["socialaccount_sociallogin"] = sociallogin.serialize()
     return headed_redirect_response("socialaccount_signup")
 
 
 def clear_pending_signup(request):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:clear_pending_signup: Clearing pending signup for request: {request}")
     request.session.pop("socialaccount_sociallogin", None)
 
 
 def signup_by_form(request, sociallogin, form):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:signup_by_form: Signing up by form for request: {request} SocialLogin: {sociallogin} Form: {form}")
     clear_pending_signup(request)
     user, resp = form.try_save(request)
     if not resp:
@@ -42,6 +46,7 @@ def signup_by_form(request, sociallogin, form):
 
 
 def process_auto_signup(request, sociallogin):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:process_auto_signup: Processing auto signup for request: {request} SocialLogin: {sociallogin}")
     auto_signup = get_adapter().is_auto_signup_allowed(request, sociallogin)
     if not auto_signup:
         return False, None
@@ -52,9 +57,11 @@ def process_auto_signup(request, sociallogin):
     if email:
         assessment = assess_unique_email(email)
         if assessment is True:
+            logger.info(f"allauth/socialaccount/internal/flows/signup.py:process_auto_signup: Auto signup is fine for email: {email}")
             # Auto signup is fine.
             pass
         elif assessment is False:
+            logger.info(f"allauth/socialaccount/internal/flows/signup.py:process_auto_signup: Another user already has this email: {email}")
             # Oops, another user already has this address.  We cannot simply
             # connect this social account to the existing user. Reason is
             # that the email address may not be verified, meaning, the user
@@ -67,6 +74,7 @@ def process_auto_signup(request, sociallogin):
             # address conflict only after posting whereas we detected it
             # here already.
         else:
+            logger.info(f"allauth/socialaccount/internal/flows/signup.py:process_auto_signup: Auto signup is fine for email: {email}")
             assert assessment is None  # nosec
             # Prevent enumeration is properly turned on, meaning, we cannot
             # show the signup form to allow the user to input another email
@@ -76,6 +84,7 @@ def process_auto_signup(request, sociallogin):
             resp = prevent_enumeration(request, email=email)
             return False, resp
     elif app_settings.EMAIL_REQUIRED:
+        logger.info(f"allauth/socialaccount/internal/flows/signup.py:process_auto_signup: Email is required for email: {email}")
         # Nope, email is required and we don't have it yet...
         auto_signup = False
     return auto_signup, None
@@ -111,6 +120,7 @@ def process_signup(request, sociallogin):
 
 
 def complete_social_signup(request, sociallogin):
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:complete_social_signup: Auto signup is fine for email: {sociallogin.user.email}")
     return complete_signup(
         request,
         user=sociallogin.user,
