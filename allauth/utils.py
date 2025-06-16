@@ -1,3 +1,4 @@
+import logging
 import importlib
 import random
 import re
@@ -15,6 +16,7 @@ from django.utils.encoding import force_str
 
 from allauth import app_settings
 
+logger = logging.getLogger(__name__)
 
 # Magic number 7: if you run into collisions with this number, then you are
 # of big enough scale to start investing in a decent user model...
@@ -205,6 +207,7 @@ def build_absolute_uri(request, location, protocol=None):
 
 
 def get_form_class(forms, form_id, default_form):
+    logger.info(f"In allauth/utils.py:get_form_class - {forms} - {form_id} - {default_form}")
     form_class = forms.get(form_id, default_form)
     if isinstance(form_class, str):
         form_class = import_attribute(form_class)
