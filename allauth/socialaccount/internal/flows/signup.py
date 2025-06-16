@@ -37,7 +37,7 @@ def clear_pending_signup(request):
 
 
 def signup_by_form(request, sociallogin, form):
-    logger.info(f"allauth/socialaccount/internal/flows/signup.py:signup_by_form: Signing up by form for request: {request} SocialLogin: {sociallogin} Form: {form}")
+    logger.info(f"allauth/socialaccount/internal/flows/signup.py:signup_by_form: Signing up by form for request: {request} SocialLogin: {sociallogin} Form: {type(form)}")
     clear_pending_signup(request)
     user, resp = form.try_save(request)
     if not resp:

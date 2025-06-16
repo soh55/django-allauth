@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
@@ -21,6 +23,7 @@ from ..utils import get_form_class
 from . import app_settings
 from .adapter import get_adapter
 
+logger = logging.getLogger(__name__)
 
 class SignupView(
     RedirectAuthenticatedUserMixin,
@@ -32,10 +35,14 @@ class SignupView(
     template_name = "socialaccount/signup." + account_settings.TEMPLATE_EXTENSION
 
     def get_form_class(self):
+        logger.info(f"allauth/socialaccount/views.py:SignupView:get_form_class: Getting form class for request: {self.request} SocialLogin: {self.sociallogin} Form: {type(self.form_class)}")
+        form = get_form_class(app_settings.FORMS, "signup", self.form_class)
+        logger.info(f"Found form: {type(form)}")
         return get_form_class(app_settings.FORMS, "signup", self.form_class)
 
     @method_decorator(login_not_required)
     def dispatch(self, request, *args, **kwargs):
+        logger.info(f"allauth/socialaccount/views.py:SignupView:dispatch: Dispatching request: {request}")
         self.sociallogin = flows.signup.get_pending_signup(request)
         if not self.sociallogin:
             return HttpResponseRedirect(reverse("account_login"))
@@ -52,6 +59,7 @@ class SignupView(
         return ret
 
     def form_valid(self, form):
+        logger.info(f"allauth/socialaccount/views.py:SignupView:form_valid: Signing up by form for request: {self.request} SocialLogin: {self.sociallogin} Form: {type(form)}")
         return flows.signup.signup_by_form(self.request, self.sociallogin, form)
 
     def get_context_data(self, **kwargs):
