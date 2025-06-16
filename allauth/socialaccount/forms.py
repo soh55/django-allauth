@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 
 from allauth.account.forms import BaseSignupForm
@@ -7,6 +9,7 @@ from . import app_settings
 from .adapter import get_adapter
 from .models import SocialAccount
 
+logger = logging.getLogger(__name__)
 
 class SignupForm(BaseSignupForm):
     def __init__(self, *args, **kwargs):
@@ -23,6 +26,7 @@ class SignupForm(BaseSignupForm):
         super(SignupForm, self).__init__(*args, **kwargs)
 
     def save(self, request):
+        logger.info("In allauth/socialaccount/forms.py:SignupForm:save")
         adapter = get_adapter()
         user = adapter.save_user(request, self.sociallogin, form=self)
         self.custom_signup(request, user)

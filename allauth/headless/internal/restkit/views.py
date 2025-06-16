@@ -19,7 +19,7 @@ class RESTView(View):
         return self.handle(request, *args, **kwargs)
 
     def handle(self, request, *args, **kwargs):
-        logger.error("In handle")
+        logger.error("In allauth/headless/internal/restkit/views.py:RESTView:handle")
         if self.handle_json_input and request.method != "GET":
             self.data = self._parse_json(request)
             response = self.handle_input(self.data)
@@ -28,17 +28,18 @@ class RESTView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_input_class(self):
-        logger.error("In get_input_class")
+        logger.error("In allauth/headless/internal/restkit/views.py:RESTView:get_input_class")
         input_class = self.input_class
         if isinstance(input_class, dict):
             input_class = input_class.get(self.request.method)
+
         return input_class
 
     def get_input_kwargs(self):
         return {}
 
     def handle_input(self, data):
-        logger.error("In handle_input")
+        logger.error("In allauth/headless/internal/restkit/views.py:RESTView:handle_input")
         input_class = self.get_input_class()
         if not input_class:
             return
@@ -47,18 +48,16 @@ class RESTView(View):
             # Make form bound on empty POST
             data = {}
         self.input = input_class(data=data, **input_kwargs)
-        print("In handle input")
-        print(self.input)
         if not self.input.is_valid():
             print("In handle invalid input")
             return self.handle_invalid_input(self.input)
 
     def handle_invalid_input(self, input):
-        logger.error("In handle_invalid_input")
+        logger.error("In allauth/headless/internal/restkit/views.py:RESTView:handle_invalid_input")
         return ErrorResponse(self.request, input=input)
 
     def _parse_json(self, request):
-        logger.error("In _parse_json")
+        logger.error("In allauth/headless/internal/restkit/views.py:RESTView:_parse_json")
         if request.method == "GET" or not request.body:
             return
         try:
